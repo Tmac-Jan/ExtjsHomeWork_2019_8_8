@@ -1,0 +1,232 @@
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Accordion Layout</title>
+    <link rel="stylesheet" type="text/css" href="./resources/css/ext-all.css"/>
+    <!-- GC -->
+    <!-- LIBS -->
+    <script type="text/javascript" src="./adapter/ext/ext-base.js"></script>
+    <!-- ENDLIBS -->
+    <script type="text/javascript" src="./ext-all.js"></script>
+    <style type="text/css">
+        html, body {
+            font: normal 12px verdana;
+            margin: 0;
+            padding: 0;
+            border: 0 none;
+            overflow: hidden;
+            height: 100%;
+        }
+
+        .empty .x-panel-body {
+            padding-top: 20px;
+            text-align: center;
+            font-style: italic;
+            color: gray;
+            font-size: 11px;
+        }
+    </style>
+    <script type="text/javascript">
+        Ext.onReady(function () {
+            var navHandler = function (direction) {
+
+                var wizard = Ext.getCmp('wizard').layout;
+                var prev = Ext.getCmp('move-prev');
+                var next = Ext.getCmp('move-next');
+                var activeId = wizard.activeItem.id;
+
+                if (activeId == 'card-0') {
+                    if (direction == 1) {
+                        let classWaste = Ext.getCmp('class-waste').getValue();
+                        if (classWaste == null || classWaste.boxLabel.length === 0) {
+                            Ext.MessageBox.alert('提示', '请选择一个值!');
+                            return;
+                        }
+                        wizard.setActiveItem(1);
+                        prev.setDisabled(false);
+                    }
+                } else if (activeId == 'card-1') {
+                    if (direction == -1) {
+                        wizard.setActiveItem(0);
+                        prev.setDisabled(true);
+                    } else {
+                        const classOperation = Ext.getCmp('class-operation').items;
+                        let result = '';
+                        for (let i = 0; i < classOperation.length; i++) {
+                            if (classOperation.get(i).checked) {
+                                result += classOperation.get(i).boxLabel + ';' + '\n';
+                            }
+                        }
+                        if (result.length === 0) {
+                            Ext.MessageBox.alert('提示', '请选择一个值!');
+                            return;
+                        }
+                        let classWaste = Ext.getCmp('class-waste').getValue();
+                        Ext.getCmp('q1').setValue(classWaste.boxLabel);
+                        Ext.getCmp('q2').setValue(result);
+                        wizard.setActiveItem(2);
+                        next.setDisabled(true);
+                    }
+                } else if (activeId == 'card-2') {
+                    if (direction == -1) {
+                        wizard.setActiveItem(1);
+                        next.setDisabled(false);
+                    }
+                }
+            };
+            var formPanel = new Ext.form.FormPanel({
+                id: 'testForm',
+                labelAlign: 'center',
+                title: '我的答案',
+                labelWidth: 50,
+                frame: true,
+                // autoHeight: true,
+                items: [
+                    {
+                        xtype: 'textarea',
+                        width:'100%',
+                        id: 'q1',
+                        name: 'q1',
+                        fieldLabel: '第一题',
+                        readOnly: true
+                    },
+                    {
+                        xtype: 'textarea',
+                        width:'100%',
+                        id: 'q2',
+                        name: 'q2',
+                        fieldLabel: '第二题',
+                        readOnly: true
+                    },],
+                buttons: [
+                    {
+                        text: '提交',
+                        listeners: {
+                            'click': function (btn, e) {
+                                Ext.MessageBox.alert('ComboBox','提交成功！');
+                            }
+                        }
+                    },]
+            });
+            var question1 = new Ext.form.FieldSet({
+                title: '垃圾分类第1题',
+                autoHeight: true,
+                fieldLabel: '',
+                items: [
+                    {
+                        id: 'class-waste',
+                        xtype: 'radiogroup',
+                        vertical: true,
+                        columns: 1,
+                        items: [
+                            {
+                                xtype: 'label',
+                                text: 'Q1:番茄酱属于以下哪种垃圾？（单选）',
+                                cls: 'x-form-check-group-label',
+                            },
+                            {
+                                labelSeparator: '',
+                                boxLabel: '湿垃圾',
+                                name: 'class-waste',
+                                inputValue: 1,
+                            }, {
+                                labelSeparator: '',
+                                boxLabel: '干垃圾',
+                                name: 'class-waste',
+                                inputValue: 2,
+                            }, {
+                                labelSeparator: '',
+                                boxLabel: '有害垃圾',
+                                name: 'class-waste',
+                                inputValue: 3,
+                            }, {
+                                fieldLabel: '',
+                                labelSeparator: '',
+                                boxLabel: '可回收物',
+                                name: 'class-waste',
+                                inputValue: 4,
+                            }
+                        ]
+                    }
+
+                ]
+            });
+            var question2 = new Ext.form.FieldSet({
+                title: '垃圾分类第2题',
+                id: 'class-operation',
+                autoHeight: true,
+                defaultType: 'checkbox', // each item will be a checkbox
+                items: [
+                    {
+                        xtype: 'label',
+                        text: 'Q50：王大叔出门遛狗后，哪些是正确处理狗粑粑的方法？（多选）',
+                        cls: 'x-form-check-group-label',
+                        anchor: '-15'
+                    },
+                    {
+                        labelSeparator: '',
+                        boxLabel: '把粑粑用废报纸包好带回家冲掉',
+                        name: 'class-operation',
+                        inputValue: 5
+                    }, {
+                        labelSeparator: '',
+                        boxLabel: '受污染的报纸按有害垃圾处理',
+                        name: 'class-operation',
+                        inputValue: 6
+                    }, {
+                        labelSeparator: '',
+                        boxLabel: '没受污染的报纸按可回收垃圾处理',
+                        name: 'class-operation',
+                        inputValue: 7
+                    }, {
+                        fieldLabel: '',
+                        labelSeparator: '',
+                        boxLabel: '受污染的报纸浸水后当湿垃圾处理',
+                        name: 'class-operation',
+                        inputValue: 8
+                    }]
+            });
+            var viewport = new Ext.Viewport({
+                layout: 'border',
+                items: [
+                    {
+                        region: 'center',
+                        id: 'wizard',
+                        width: 200,
+                        title: '垃圾分类考试',
+                        layout: 'card',
+                        activeItem: 0,
+                        bodyStyle: 'padding:15px',
+                        defaults: {
+                            border: false
+                        },
+                        items: [{
+                            id: 'card-0',
+                            items: [question1],
+                        },
+                            {
+                                id: 'card-1',
+                                items: [question2]
+                            },
+                            {
+                                id: 'card-2',
+                                items: [formPanel]
+                            }],
+                        bbar: [{
+                            id: 'move-prev',
+                            text: '上一步',
+                            handler: navHandler.createDelegate(this, [-1]),
+                            disabled: true
+                        }, '->', {
+                            id: 'move-next',
+                            text: '下一步',
+                            handler: navHandler.createDelegate(this, [1])
+                        }],
+                    }]
+            });
+        });
+    </script>
+</head>
+<body>
+</body>
+</html>
